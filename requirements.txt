@@ -1,0 +1,2 @@
+django>=1.10
+-e git://github.com/iskme/eventlog.git#egg=eventlog
