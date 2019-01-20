@@ -29,8 +29,9 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 # eventlog configuration (logstash server)
-EVENTLOG_HOST = 'logstash'
-EVENTLOG_PORT = 5001
+EVENTLOG_HOST = '10.100.1.134'
+EVENTLOG_PORT = 6801
+EVENTLOG_FORMAT = 'json'
 EVENTLOG_DB   = os.path.join(BASE_DIR, 'eventlog.db')
 EVENTLOG_SITE = 'local'
 EVENTLOG_CLUSTER = 'local'

@@ -17,14 +17,20 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.http import HttpResponse
 
-from . import counter
+from . counter import CounterAPI
 
 def hello(request):
     return HttpResponse("Hello world!",content_type="text/plain")
 
+
+counterControl = CounterAPI('demo_counter')
+
+
 urlpatterns = [
-    url(r'^set/(?P<val>[0-9]+)/$', counter.set),
-    url(r'^increment/(?P<amt>[0-9]+)/$', counter.increment),
+    url(r'^get/$', counterControl.get),
+    url(r'^set/(?P<val>[0-9]+)/$', counterControl.set),
+    url(r'^inc/(?P<amt>[0-9]+)/$', counterControl.inc),
+    url(r'^inc/$', counterControl.inc),
     url(r'^admin/', admin.site.urls),
     url(r'^hello/', hello),
 ]

@@ -1,47 +1,56 @@
 from django.http import HttpResponse
 import logging
 
-from eventlog import Event, asyncEventLogger
-logEvent = asyncEventLogger.logEvent
+from eventlog import Event, defaultAsyncLogger
+logEvent = defaultAsyncLogger().logEvent
 
 
 logger = logging.getLogger('mysite-counter')
-logger.addHandler(asyncEventLogger)
+logger.addHandler(defaultAsyncLogger())
 logger.setLevel(logging.DEBUG)
 
-counter = { 'value': 0 }
-
+# A simple counter object that logs changes
 class Counter(object):
 
-  def __init__(self, initialValue=0):
+  def __init__(self, name, initialValue=0):
     self.value = initialValue
+    self.name = name or "count"
 
-  def getVal(self):
+  def get(self):
     return self.value
 
-  def setVal(self,val):
+  def set(self,val):
     self.value = val
     # record counter.set event
-    logEvent(Event('set','counter',metrics=[('value',self.value)]))
+    logEvent(Event(self.name + "_set","", value=self.value))
+    return self.value
 
-  def incrementVal(self,amt):
+  def inc(self,amt):
     self.value += amt
     # record counter.increment event
-    logEvent(Event('increment','counter',metrics=[('amount', amt),('value',self.value)]))
+    logEvent(Event(self.name + "_increment", "", value=self.value, \
+                   fields={'amount':amt}))
+    return self.value
 
 
-_counter = Counter()
 
+# counterAPI provides rest api for manipulating counter
+class CounterAPI:
 
-def set(request, val='0'):
-  logger.debug("view.set, val=%s" % val)
-  _counter.setVal(int(val))
-  return HttpResponse("Counter value is now %d\n" % _counter.getVal(),
+    def __init__(self, name, initialValue=0):
+        self.counter = Counter(name, initialValue)
+
+    def _makeResponse(self):
+        return HttpResponse("value=%d\n" % self.counter.get(),
           content_type = 'text/plain')
 
-def increment(request, amt='1'):
-  logger.debug("view.increment, amt=%s" % amt)
-  _counter.incrementVal(int(amt))
-  return HttpResponse("Counter value is now %d\n" % _counter.getVal(),
-          content_type = 'text/plain')
+    def get(self, request):
+        return self._makeResponse()
 
+    def set(self, request, val):
+        self.counter.set(int(val))
+        return self._makeResponse()
+
+    def inc(self, request, amt=1):
+        self.counter.inc(int(amt))
+        return self._makeResponse()
