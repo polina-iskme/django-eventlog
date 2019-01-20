@@ -1,9 +1,8 @@
 import time
 from django.conf import settings
-from django_eventlog import getCurrentRequest, setCurrentRequest, getRequestId, setRequestId
-from eventlog import Event, initMiddleware, asyncEventLogger
+from eventlog import Event, initMiddleware, logEvent
 from random import random
-
+from . thread_data import getCurrentRequest, getRequestId, setCurrentRequest, setRequestId
 _sessionHelper = None
 
 
@@ -37,7 +36,7 @@ class EventLogMiddleware(object):
         initMiddleware(getUserContext)
 
         # start counter with a 32-bit int, but could be transferred as 64-bit int
-        # Properties of requid:
+        # Properties of reqid:
         # 1. randomness should provide uniqueness for sessions on same day
         #    even across sites (e.g., host/reqid )
         # 2. all events associated with a request have the same pid/reqid
@@ -73,7 +72,7 @@ class EventLogMiddleware(object):
                 'forwardedFor': self.forwardedFor(request),
             },
         )
-        asyncEventLogger.logEvent(event)
+        logEvent(event)
 
     def __call__(self, request):
         self.reqid = self.reqid + 1
