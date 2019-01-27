@@ -28,14 +28,15 @@ DEBUG = True
 #ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]']
 ALLOWED_HOSTS = ['*']
 
-# eventlog configuration (logstash server)
-EVENTLOG_HOST = '10.100.1.134'
+# eventlog configuration (log forwarding server)
+# to use console logging only, set EVENTLOG_HOST=''
+EVENTLOG_HOST = '172.17.0.1'
 EVENTLOG_PORT = 6801
 EVENTLOG_FORMAT = 'json'
-EVENTLOG_DB   = os.path.join(BASE_DIR, 'eventlog.db')
 EVENTLOG_SITE = 'local'
 EVENTLOG_CLUSTER = 'local'
 EVENTLOG_SESSION_HELPER = 'mysite.SessionEventHelper'
+
 
 # Application definition
 
