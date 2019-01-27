@@ -17,7 +17,7 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.http import HttpResponse
 
-from . counter import CounterAPI
+from . events import CounterAPI
 
 def hello(request):
     return HttpResponse("Hello world!",content_type="text/plain")
