@@ -1,13 +1,13 @@
 import time
 from django.conf import settings
-from eventlog import Event, initMiddleware, logEvent
 from random import random
 from . thread_data import getCurrentRequest, getRequestId, setCurrentRequest, setRequestId
 _sessionHelper = None
 
 
 # returns tuple of requestId, user, sessionId
-# this is a hook invoked by the eventlog package
+# This hook allows Events to contain user and sessionid, even if the Event
+# is created deep in the call stack where the 'request' object is not available.
 def getUserContext():
     req, reqid = getCurrentRequest(), getRequestId()
     user, session = '', ''
@@ -31,10 +31,6 @@ class EventLogMiddleware(object):
     def __init__(self, processRequest):
         self.processRequest = processRequest
 
-        # set up callback so eventlog package can initialize
-        # request-related information (reqid, user, session)
-        initMiddleware(getUserContext)
-
         # start counter with a 32-bit int, but could be transferred as 64-bit int
         # Properties of reqid:
         # 1. randomness should provide uniqueness for sessions on same day
@@ -43,17 +39,27 @@ class EventLogMiddleware(object):
         # 3. requests are increasing for same server until server restarts
         self.reqid = int(random()*0xffffffff)
 
-    def forwardedFor(self, request):
-        ff = request.META.get('HTTP_X_FORWARDED_FOR', None)
-        if ff is not None:
-            # make it a list
-            return ff.replace(' ', '').split(',')
-        else:
-            return None
+        # defer defining logEvent so django can initialize alternate handler
+        from eventlog import Event, initMiddleware, defaultEventHandler
+        # set up callback so eventlog package can initialize
+        # request-related information (reqid, user, session)
+        initMiddleware(getUserContext)
+        # use django-defined handler if defined,
+        # otherwise, use system default
+        try:
+            self.logEvent = settings.EVENT_HANDLER.logEvent
+        except Exception:
+            self.logEvent = defaultEventHandler().logEvent
+        self._Event = Event
 
     def logHttpEvent(self, request, response, duration):
-        method = request.META.get('REQUEST_METHOD', '').lower()
-        event = Event(
+        rmeta = request.META
+        forwardedFor = rmeta.get('HTTP_X_FORWARDED_FOR', None)
+        if forwardedFor is not None:
+            # make it a list
+            forwardedFor = forwardedFor.replace(' ', '').split(',')
+
+        event = self._Event(
             name='http_request',
             target=request.path,
             message=request.body,
@@ -62,17 +68,17 @@ class EventLogMiddleware(object):
                 'duration': duration,
                 'remoteHost':  request.get_host(),
                 'path': request.path,  # (full path, not including query params)
-                'method':  method,
-                'userAgent': request.META.get('HTTP_USER_AGENT', ''),
-                'remoteAddr': request.META.get('REMOTE_ADDR', ''),
-                'query': request.META.get('QUERY_STRING', ''),
-                'referer':  request.META.get('HTTP_REFERER', ''),
+                'method':  rmeta.get('REQUEST_METHOD', '').lower(),
+                'userAgent': rmeta.get('HTTP_USER_AGENT', ''),
+                'remoteAddr': rmeta.get('REMOTE_ADDR', ''),
+                'query': rmeta.get('QUERY_STRING', ''),
+                'referer':  rmeta.get('HTTP_REFERER', ''),
                 'body': request.body,  # post body
-                'forwardedProto': request.META.get('HTTP_X_FORWARDED_PROTO', None),
-                'forwardedFor': self.forwardedFor(request),
+                'forwardedProto': rmeta.get('HTTP_X_FORWARDED_PROTO', None),
+                'forwardedFor': forwardedFor,
             },
         )
-        logEvent(event)
+        self.logEvent(event)
 
     def __call__(self, request):
         self.reqid = self.reqid + 1
