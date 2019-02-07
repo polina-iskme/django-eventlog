@@ -48,15 +48,17 @@ Not tested with Django 2.x.
     EVENTLOG_DATACTR = "us-east-1"
     # EVENTLOG_CLUSTER is a cluster id within the data center, if applicable
     EVENTLOG_CLUSTER = ""
-    # EVENTLOG_DEPLOY is deploy type ("prod", "stage', "demo", "dev", etc.)
-    EVENTLOG_DEPLOY = "prod"
+    # EVENTLOG_DEPLOY is an integer code for deploy type
+    # 0: production, 1:staging, 2:development, 3:testing,
+    # 4: demo, 5:pilot
+    EVENTLOG_DEPLOY = 0
 
-    # EVENTLOG_SESSION_HELPER is a function to return the
-    #    user id and session id. see the link below for sample implementation
-    #    https://github.com/ISKME/django-eventlog/blob/master/src/examples/django-demo/mysite/__init__.py
-    EVENTLOG_SESSION_HELPER = 'mysite.SessionEventHelper'
+    # EVENTLOG_SESSION_HELPER is an optional function to return the
+    #    user id and session id from the request object.
+    #    A default implementation is in middleware.py, which should work
+    #    if there's nothing special about your session object.
+    #EVENTLOG_SESSION_HELPER = 'mysite.SessionEventHelper'
 
- 
 
 3. in site/settings.py, add the following to MIDDLEWARE::
 
@@ -64,13 +66,4 @@ Not tested with Django 2.x.
 
 This should be placed after Session middleware so that
 the session is initialized and the current user is established.
-
-
-4. Implement a handler to populate the "session" and "user"
-fields of the Event object from the request. 
-See ```examples/django-demo/mysite/__init__.py``` for an example.
-
-After implementing the class, define the class name in ```settings.py```::
-
-    EVENTLOG_SESSION_HELPER = 'mysite.SessionEventHelper'
 

@@ -3,6 +3,7 @@ import random
 from django.conf import settings
 from . thread_data import getCurrentRequest, setCurrentRequest
 from eventlog.event_pb2 import HttpMethod
+
 _sessionHelper = None
 
 
@@ -17,6 +18,18 @@ def getUserContext():
     return (user, session)
 
 
+# default SessionEventHelper, if it's not overridden in settings
+class SessionEventHelper(object):
+    # return tuple (user,session) if user is logged in,
+    # or ('guest','0') for guest users
+    def getUserSession(self, request):
+        if request and getattr(request, 'session', False):
+            return (request.user, request.session)
+        # if user is not logged in, return a unique token
+        # for guest/anonymous user
+        return ('guest', '0')
+
+
 # get app-defined helper function for
 # retrieving user and session id
 if getattr(settings, 'EVENTLOG_SESSION_HELPER', None):
@@ -25,7 +38,8 @@ if getattr(settings, 'EVENTLOG_SESSION_HELPER', None):
     (mod, cls) = helper.rsplit('.', 1)
     clasz = getattr(importlib.import_module(mod), cls)
     _sessionHelper = clasz()
-
+else:
+    _sessionHelper = SessionEventHelper()
 
 class EventLogMiddleware(object):
 
