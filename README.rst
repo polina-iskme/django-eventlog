@@ -36,14 +36,25 @@ Not tested with Django 2.x.
 2. in site/settings.py, define the following.
 (Alternately, these may be set as environment variables):
 ```
-    # eventlog configuration (logstash server)
+    # EVENTLOG_HOST is Host name or IP address of logproxy server
+    # to use console loging only, set EVENTLOG_HOST=""
     EVENTLOG_HOST = '172.17.0.1'
-    EVENTLOG_PORT = 5001
-    EVENTLOG_DB   = os.path.join(BASE_DIR, 'eventlog.db')
+    # EVENTLOG_PORT is port number of logproxy listener
+    EVENTLOG_PORT = 6801
+    # EVENTLOG_CLIENT is a slug for client name
+    EVENTLOG_CLIENT = "acme"
+    # EVENTLOG_DATACTR is the datacenter or zone where servers are located
+    EVENTLOG_DATACTR = "us-east-1"
+    # EVENTLOG_CLUSTER is a cluster id within the data center, if applicable
+    EVENTLOG_CLUSTER = ""
+    # EVENTLOG_DEPLOY is deploy type ("prod", "stage', "demo", "dev", etc.)
+    EVENTLOG_DEPLOY = "prod"
 
-    # hostname identification for logging
-    EVENTLOG_SITE = 'local'
-    EVENTLOG_CLUSTER = 'local'
+    # EVENTLOG_SESSION_HELPER is a function to return the
+    #    user id and session id. see the link below for sample implementation
+    #    https://github.com/ISKME/django-eventlog/blob/master/src/examples/django-demo/mysite/__init__.py
+    EVENTLOG_SESSION_HELPER = 'mysite.SessionEventHelper'
+
 ```
 
 3. in site/settings.py, add the following to MIDDLEWARE
@@ -54,7 +65,7 @@ Not tested with Django 2.x.
 This should be placed after Session middleware so that
 the session is initialized and the current user is established.
 
-4. It may also be useful to update logging handlers in settings.py
+4.
 
 5. Implement a handler to populate the "session" and "user"
 fields of the Event object from the request. See ```examples/django-demo/mysite/__init__.py``` for an example.
@@ -64,7 +75,6 @@ After implementing the class, define the class name in ```settings.py```:
 ```
     EVENTLOG_SESSION_HELPER = 'mysite.SessionEventHelper'
 ```
-
 
 
 # Usage

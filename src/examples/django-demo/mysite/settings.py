@@ -28,13 +28,22 @@ DEBUG = True
 #ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]']
 ALLOWED_HOSTS = ['*']
 
-# eventlog configuration (log forwarding server)
-# to use console logging only, set EVENTLOG_HOST=''
+
+# EVENTLOG_HOST is Host name or IP address of logproxy server
+# to use console loging only, set EVENTLOG_HOST=""
 EVENTLOG_HOST = '172.17.0.1'
+# EVENTLOG_PORT is port number of logproxy listener
 EVENTLOG_PORT = 6801
-EVENTLOG_FORMAT = 'json'
-EVENTLOG_SITE = 'local'
-EVENTLOG_CLUSTER = 'local'
+# EVENTLOG_CLIENT is a slug for client name
+EVENTLOG_CLIENT = "acme"
+# EVENTLOG_DATACTR is the datacenter or zone where servers are located
+EVENTLOG_DATACTR = "us-east-1"
+# EVENTLOG_CLUSTER is a cluster id within the data center, if applicable
+EVENTLOG_CLUSTER = ""
+# EVENTLOG_DEPLOY is deploy type ("prod", "stage', "demo", "dev", etc.)
+EVENTLOG_DEPLOY = "prod"
+
+
 EVENTLOG_SESSION_HELPER = 'mysite.SessionEventHelper'
 
 

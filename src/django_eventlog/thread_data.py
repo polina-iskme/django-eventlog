@@ -29,13 +29,5 @@ def getCurrentRequest():
     return getGlobal('request', None)
 
 
-def getRequestId():
-    return getGlobal('event_reqid', 0)
-
-
 def setCurrentRequest(req):
     setGlobal('request', req)
-
-
-def setRequestId(reqid):
-    setGlobal('event_reqid', reqid)
