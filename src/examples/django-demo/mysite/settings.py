@@ -40,7 +40,9 @@ EVENTLOG_CLIENT = "acme"
 EVENTLOG_DATACTR = "us-east-1"
 # EVENTLOG_CLUSTER is a cluster id within the data center, if applicable
 EVENTLOG_CLUSTER = ""
-# EVENTLOG_DEPLOY is deploy type ("prod", "stage', "demo", "dev", etc.)
+# EVENTLOG_DEPLOY is an integer code for deploy type
+# 0: production, 1:staging, 2:development, 3:testing,
+# 4: demo, 5:pilot
 EVENTLOG_DEPLOY = 0
 
 #EVENTLOG_SESSION_HELPER = 'mycustom.SessionEventHelper'
