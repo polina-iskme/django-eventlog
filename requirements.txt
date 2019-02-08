@@ -1,2 +1,2 @@
-django>=1.10
--e git://github.com/iskme/eventlog.git#egg=eventlog
+django>=1.10,<2.0
+-e git+https://github.com/iskme/eventlog.git#egg=eventlog

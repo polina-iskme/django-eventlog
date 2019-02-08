@@ -4,7 +4,7 @@ from os import path
 from setuptools import setup
 
 NAME = "django-eventlog"
-VERSION = "0.0.1"
+VERSION = "0.9.0"
 
 here = path.abspath(path.dirname(__file__))
 
@@ -35,5 +35,11 @@ setup(
     keywords="django eventlog logging asynchronous logstash fluent pubsub",
     packages=["django_eventlog"],
     package_dir={"": "src"},
-    install_requires=[],
+    install_requires=[
+        "django>=1.10,<2.0",
+        "eventlog",
+    ],
+    dependency_links=[
+	"https://github.com/iskme/eventlog/tarball/master#egg=eventlog",
+    ],
 )
