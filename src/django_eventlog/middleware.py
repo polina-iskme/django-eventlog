@@ -3,6 +3,7 @@ import random
 from django.conf import settings
 from . thread_data import getCurrentRequest, setCurrentRequest
 from eventlog.event_pb2 import HttpMethod
+from django.utils.deprecation import MiddlewareMixin
 
 _sessionHelper = None
 
@@ -41,11 +42,11 @@ if getattr(settings, 'EVENTLOG_SESSION_HELPER', None):
 else:
     _sessionHelper = SessionEventHelper()
 
-class EventLogMiddleware(object):
+class EventLogMiddleware(MiddlewareMixin):
 
     def __init__(self, get_response=None):
-        self.get_response = get_response
-        super(EventLogMiddleware, self).__init__()
+        #self.get_response = get_response
+        super(EventLogMiddleware, self).__init__(get_response)
 
         # defer defining logEvent so django can initialize alternate handler
         from eventlog import newEvent, initMiddleware, defaultEventHandler
@@ -85,20 +86,14 @@ class EventLogMiddleware(object):
         e.http.forwarded_for = rmeta.get('HTTP_X_FORWARDED_FOR', '')
         self.logEvent(e)
 
-    def __call__(self, request):
-        response = None
+    def process_request(self, request):
         setCurrentRequest(request)
-        startTime = time.clock()
-        try:
-            if hasattr(self, 'process_request'):
-                # pre-1.10 middleware style
-                response = self.process_request(request)
-            # 1.10+ middleware api passes get_response to __init__()
-            response = response or self.get_response(request)
-            if hasattr(self, 'process_response'):
-                response = self.process_response(request, response)
+        request.evt_startTime = time.clock()
+        return None
 
-            self.logHttpEvent(request, response, time.clock()-startTime)
-            return response
+    def process_response(self, request, response):
+        try:
+            self.logHttpEvent(request, response, time.clock()-request.evt_startTime)
         finally:
             setCurrentRequest(None)
+        return response
