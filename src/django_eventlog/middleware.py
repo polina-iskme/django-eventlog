@@ -43,8 +43,9 @@ else:
 
 class EventLogMiddleware(object):
 
-    def __init__(self, processRequest):
-        self.processRequest = processRequest
+    def __init__(self, get_response=None):
+        self.get_response = get_response
+        super(EventLogMiddleware, self).__init__()
 
         # defer defining logEvent so django can initialize alternate handler
         from eventlog import newEvent, initMiddleware, defaultEventHandler
@@ -85,10 +86,18 @@ class EventLogMiddleware(object):
         self.logEvent(e)
 
     def __call__(self, request):
+        response = None
         setCurrentRequest(request)
         startTime = time.clock()
         try:
-            response = self.processRequest(request)
+            if hasattr(self, 'process_request'):
+                # pre-1.10 middleware style
+                response = self.process_request(request)
+            # 1.10+ middleware api passes get_response to __init__()
+            response = response or self.get_response(request)
+            if hasattr(self, 'process_response'):
+                response = self.process_response(request, response)
+
             self.logHttpEvent(request, response, time.clock()-startTime)
             return response
         finally:
