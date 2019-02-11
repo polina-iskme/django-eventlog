@@ -4,7 +4,7 @@ from os import path
 from setuptools import setup
 
 NAME = "django-eventlog"
-VERSION = "0.9.0"
+VERSION = "1.0.0"
 
 here = path.abspath(path.dirname(__file__))
 
