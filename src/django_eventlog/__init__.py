@@ -1,5 +1,5 @@
 from .apps import EventMiddlewareConfig
-from .middleware import EventLogMiddleware, getUserContext
+from .middleware import EventLogMiddleware
 
 __all__ = [
     EventLogMiddleware,

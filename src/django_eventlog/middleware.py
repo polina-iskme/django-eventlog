@@ -1,5 +1,4 @@
 import time
-import random
 from django.conf import settings
 from . thread_data import getCurrentRequest, setCurrentRequest
 from eventlog.event_pb2 import HttpMethod
@@ -42,10 +41,10 @@ if getattr(settings, 'EVENTLOG_SESSION_HELPER', None):
 else:
     _sessionHelper = SessionEventHelper()
 
+
 class EventLogMiddleware(MiddlewareMixin):
 
     def __init__(self, get_response=None):
-        #self.get_response = get_response
         super(EventLogMiddleware, self).__init__(get_response)
 
         # defer defining logEvent so django can initialize alternate handler
@@ -71,7 +70,7 @@ class EventLogMiddleware(MiddlewareMixin):
             name='http_request',
             target=request.path,
             value=response.status_code,
-            duration = duration
+            duration=duration
             )
         e.http.status = response.status_code
         e.http.method = HttpMethod.Value(rmeta.get('REQUEST_METHOD', '').upper())
