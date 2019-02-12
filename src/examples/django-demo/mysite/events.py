@@ -19,7 +19,7 @@ class CounterAPI:
 
     def _makeResponse(self):
         return HttpResponse("value=%d\n" % self.counter.get(),
-          content_type = 'text/plain')
+                            content_type='text/plain')
 
     def get(self, request):
         return self._makeResponse()

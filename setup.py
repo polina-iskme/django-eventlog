@@ -40,6 +40,6 @@ setup(
         "eventlog",
     ],
     dependency_links=[
-	"https://github.com/iskme/eventlog/tarball/master#egg=eventlog",
+        "https://github.com/iskme/eventlog/tarball/master#egg=eventlog",
     ],
 )

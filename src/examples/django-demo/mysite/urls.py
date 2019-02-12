@@ -19,8 +19,9 @@ from django.http import HttpResponse
 
 from . events import CounterAPI
 
+
 def hello(request):
-    return HttpResponse("Hello world!",content_type="text/plain")
+    return HttpResponse("Hello world!", content_type="text/plain")
 
 
 counterControl = CounterAPI('demo_counter')
