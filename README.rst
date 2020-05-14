@@ -62,7 +62,7 @@ Not tested with Django 2.x.
 
 3. in site/settings.py, add the following to MIDDLEWARE::
 
-    'django_eventlog.middleware.EventLogMiddleware'
+  'django_eventlog.middleware.EventLogMiddleware'
 
 This should be placed after Session middleware so that
 the session is initialized and the current user is established.
