@@ -28,13 +28,13 @@ Installation and setup
 This requires Django >= 1.10 and Python 2.7+ or 3.6+.
 Not tested with Django 2.x.
 
-# Install the package::
+1. Install the package::
 
     pip install https://github.com/iskme/django-eventlog
 
 
 
-#. in site/settings.py, define the following.
+2. in site/settings.py, define the following.
 (Alternately, these may be set as environment variables)::
 
     # EVENTLOG_HOST is Host name or IP address of logproxy server
@@ -60,7 +60,7 @@ Not tested with Django 2.x.
     #EVENTLOG_SESSION_HELPER = 'mysite.SessionEventHelper'
 
 
-#. in site/settings.py, add the following to MIDDLEWARE::
+3. in site/settings.py, add the following to MIDDLEWARE::
 
     'django_eventlog.middleware.EventLogMiddleware'
 
